@@ -4,6 +4,7 @@ import (
 	"crypto"
 	"crypto/hmac"
 	"errors"
+	"github.com/golang-jwt/jwt/v4/unsafe"
 )
 
 // SigningMethodHMAC implements the HMAC-SHA family of signing methods.
@@ -68,7 +69,7 @@ func (m *SigningMethodHMAC) Verify(signingString, signature string, key interfac
 	// by reproducing the signature from the signing string and key, then
 	// comparing that against the provided signature.
 	hasher := hmac.New(m.Hash.New, keyBytes)
-	hasher.Write([]byte(signingString))
+	hasher.Write(unsafe.String2Bytes(signingString))
 	if !hmac.Equal(sig, hasher.Sum(nil)) {
 		return ErrSignatureInvalid
 	}
@@ -86,7 +87,7 @@ func (m *SigningMethodHMAC) Sign(signingString string, key interface{}) (string,
 		}
 
 		hasher := hmac.New(m.Hash.New, keyBytes)
-		hasher.Write([]byte(signingString))
+		hasher.Write(unsafe.String2Bytes(signingString))
 
 		return EncodeSegment(hasher.Sum(nil)), nil
 	}

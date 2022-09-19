@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"errors"
+	"github.com/golang-jwt/jwt/v4/unsafe"
 
 	"crypto"
 	"crypto/ed25519"
@@ -54,7 +55,7 @@ func (m *SigningMethodEd25519) Verify(signingString, signature string, key inter
 	}
 
 	// Verify the signature
-	if !ed25519.Verify(ed25519Key, []byte(signingString), sig) {
+	if !ed25519.Verify(ed25519Key, unsafe.String2Bytes(signingString), sig) {
 		return ErrEd25519Verification
 	}
 
@@ -77,7 +78,7 @@ func (m *SigningMethodEd25519) Sign(signingString string, key interface{}) (stri
 
 	// Sign the string and return the encoded result
 	// ed25519 performs a two-pass hash as part of its algorithm. Therefore, we need to pass a non-prehashed message into the Sign function, as indicated by crypto.Hash(0)
-	sig, err := ed25519Key.Sign(rand.Reader, []byte(signingString), crypto.Hash(0))
+	sig, err := ed25519Key.Sign(rand.Reader, unsafe.String2Bytes(signingString), crypto.Hash(0))
 	if err != nil {
 		return "", err
 	}
